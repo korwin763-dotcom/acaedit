@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>아카라이브 VN 레이아웃 에디터</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;600;700&family=Nanum+Myeongjo&family=Nanum+Gothic&display=swap" rel="stylesheet" />
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Noto Sans KR',sans-serif; background:#191919; color:#ccc; overflow:hidden; height:100vh; }
@@ -259,7 +258,7 @@ let blocks = [
 
 let settings = {
   bgColor:'#2b2b2b', textColor:'#e8e0d4',
-  fontSize:18, fontFamily:"'Noto Serif KR', serif",
+  fontSize:18, fontFamily:"'NanumBarunGothic', sans-serif",
   lineHeight:1.85, imageRadius:14, imageWidth:65,
   textAlign:'left', padding:48,
   dialogueEnabled: true,
@@ -275,7 +274,16 @@ let settings = {
 };
 
 let currentTab = 'blocks', showCode = false;
-let previewMode = 'desktop'; // 'desktop' | 'mobile'
+let previewMode = 'desktop';
+
+// 아카라이브 지원 폰트 목록
+const ARCA_FONTS = [
+  {l:"나눔바른고딕", v:"'NanumBarunGothic', sans-serif"},
+  {l:"나눔고딕", v:"'NanumGothic', sans-serif"},
+  {l:"Noto Sans KR", v:"'Noto Sans KR', sans-serif"},
+  {l:"Apple SD 고딕 Neo", v:"'Apple SD Gothic Neo', sans-serif"},
+  {l:"Pretendard", v:"'Pretendard', sans-serif"},
+];
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
@@ -457,13 +465,6 @@ function renderBlockCard(b, i) {
 }
 
 function renderStylePanel() {
-  const fonts = [
-    {l:"Noto Serif KR (명조)",v:"'Noto Serif KR', serif"},
-    {l:"Noto Sans KR (고딕)",v:"'Noto Sans KR', sans-serif"},
-    {l:"나눔명조",v:"'Nanum Myeongjo', serif"},
-    {l:"나눔고딕",v:"'Nanum Gothic', sans-serif"},
-    {l:"Georgia",v:"Georgia, serif"},
-  ];
   const bgP=['#2b2b2b','#1a1a2e','#1e1e1e','#2d2520','#0d1117','#f5f0e8'];
   const txP=['#e8e0d4','#ffffff','#d4d4d4','#c9b99a','#a0c4ff','#333333'];
   const als=[{v:'left',l:'왼쪽'},{v:'center',l:'가운데'},{v:'justify',l:'양쪽'}];
@@ -475,9 +476,9 @@ function renderStylePanel() {
   return `
     <div class="section-title">기본 스타일</div>
     ${colorGroup('배경색','bgColor',s.bgColor,bgP)}
-    <div class="style-group"><span class="style-label">글꼴</span>
+    <div class="style-group"><span class="style-label">글꼴 (아카라이브 지원)</span>
       <select class="style-select" onchange="setSetting('fontFamily',this.value)">
-        ${fonts.map(f=>`<option value="${esc(f.v)}" ${s.fontFamily===f.v?'selected':''}>${f.l}</option>`).join('')}
+        ${ARCA_FONTS.map(f=>`<option value="${esc(f.v)}" ${s.fontFamily===f.v?'selected':''}>${f.l}</option>`).join('')}
       </select></div>
     ${sliderGroup('글자 크기','fontSize',s.fontSize,13,28,1,'px')}
     ${sliderGroup('줄 간격','lineHeight',s.lineHeight,1.2,2.4,0.05,'')}
@@ -633,7 +634,6 @@ function renderPreview() {
 // ── Actions ──
 function updateBlock(i,key,val){
   blocks[i][key]=val;
-  // 텍스트 입력 중에는 에디터 재렌더를 건너뛰어 포커스 유지
   renderPreview();
   renderBottom();
   if (showCode) {
@@ -660,7 +660,7 @@ function resetAll(){
   ];
   settings = {
     bgColor:'#2b2b2b', textColor:'#e8e0d4',
-    fontSize:18, fontFamily:"'Noto Serif KR', serif",
+    fontSize:18, fontFamily:"'NanumBarunGothic', sans-serif",
     lineHeight:1.85, imageRadius:14, imageWidth:65,
     textAlign:'left', padding:48,
     dialogueEnabled: true,
@@ -681,7 +681,6 @@ function resetAll(){
 }
 
 function dimColor(hex, alpha) {
-  // opacity 대신 배경색과 블렌딩한 hex 색상 반환
   const bg = settings.bgColor || '#2b2b2b';
   const parse = c => { c=c.replace('#',''); if(c.length===3)c=c[0]+c[0]+c[1]+c[1]+c[2]+c[2]; return [parseInt(c.slice(0,2),16),parseInt(c.slice(2,4),16),parseInt(c.slice(4,6),16)]; };
   const [fr,fg,fb] = parse(hex), [br,bg2,bb] = parse(bg);
